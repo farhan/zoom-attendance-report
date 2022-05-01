@@ -30,9 +30,7 @@ class ZoomAPIClient(object):
     def __init__(self, zoom_admin_account):
         """Zoom API Client init"""
         self._zoom_admin_account = zoom_admin_account
-        self._token = zoom_admin_account.jwt_token
-        if not self._token:
-            self._create_jwt()
+        self._token = self._create_jwt()
 
     def _create_jwt(self):
         """Generate a new token against key and secret"""
@@ -63,8 +61,8 @@ class ZoomAPIClient(object):
             http_method, url, headers=request_headers, data=data, params=kwargs.get('query_args', {})
         )
 
-        logger.info(u'Zoom API Request: {} - {}.'.format(url, data))
-        logger.info(u'Zoom API Response: {} - {}.'.format(response.status_code, response.text))
+        print(u'Zoom API Request: {} - {}.'.format(url, data))
+        print(u'Zoom API Response: {} - {}.'.format(response.status_code, response.text))
 
         # Regenerate token in case of expiry
         if response.status_code == status.HTTP_401_UNAUTHORIZED and not kwargs.get('jwt_renewed'):
