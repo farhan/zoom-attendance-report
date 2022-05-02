@@ -16,7 +16,6 @@ if __name__ == '__main__':
         meeting_id=properties.MEETING_ID,
         zoom_admin_account=zoom_admin_account
     )
-    report_dict = report.get_report()
-    print(report_dict)
-    csv_writer.write_meeting_report_into_csv(properties, report_dict)
+    meetings, report = report.get_report()
+    csv_writer.write_meeting_report_into_csv(properties, meetings, report)
     print('----- Bye! ------')

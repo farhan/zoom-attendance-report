@@ -13,6 +13,7 @@ class ZoomMeetingReport:
     def get_report(self):
         zoom_client = ZoomAPIClient(self.zoom_admin_account)
         report = {}
+        meetings = []
         meeting_instances = zoom_client.get_meeting_instances(self.meeting_id).get('meetings', [])
         for instance in meeting_instances:
             # TODO: double encode the uuid
@@ -21,25 +22,35 @@ class ZoomMeetingReport:
             meeting_start_date_time = datetime.strptime(instance['start_time'], '%Y-%m-%dT%H:%M:%SZ')
             if self.start_date <= meeting_start_date_time <= self.end_date:
                 meeting_participant_entries = zoom_client.get_participant_report(uuid)
-                report[str(meeting_start_date_time)] = self.get_report_of_a_meeting_users(meeting_participant_entries)
+                meeting_start_date_time_str = str(meeting_start_date_time)
+                self.get_report_of_a_meeting_users(meeting_participant_entries, meeting_start_date_time_str, report)
+                meetings.append(meeting_start_date_time_str)
+        meetings.sort()
+        return meetings, report
 
-        return report
-
-    def get_report_of_a_meeting_users(self, meeting_participant_entries):
-        user_records = {}
+    def get_report_of_a_meeting_users(self, meeting_participant_entries, meeting_start_date_time, report):
         for entry in meeting_participant_entries:
             user_id = entry['id']
-            if user_id in user_records.keys():
-                user_records[user_id]['duration'] += entry.get('duration', 0)
-                user_records[user_id]['entry_exit'] = '{} + {}'.format(
-                    user_records[user_id]['entry_exit'],
+
+            if user_id not in report.keys():
+                report[user_id] = self.get_user_data(entry)
+                report[user_id]['meetings_report'] = {}
+
+            if meeting_start_date_time in report[user_id]['meetings_report'].keys():
+                meeting_report = report[user_id]['meetings_report'][meeting_start_date_time]
+                meeting_report['duration'] += entry['duration']
+                meeting_report['entry_exit'] = '{} + {}'.format(
+                    meeting_report['entry_exit'],
                     self.get_meeting_entry_exit_time(entry)
                 )
             else:
-                fields = ['id', 'name', 'user_email', 'duration']
-                user_records[user_id] = {key: entry[key] for key in fields}
-                user_records[user_id]['entry_exit'] = self.get_meeting_entry_exit_time(entry)
-        return user_records
+                meeting_report = report[user_id]['meetings_report'][meeting_start_date_time] = {}
+                meeting_report['duration'] = entry['duration']
+                meeting_report['entry_exit'] = self.get_meeting_entry_exit_time(entry)
+
+    def get_user_data(self, entry):
+        fields = ['id', 'name', 'user_email']
+        return {key: entry[key] for key in fields}
 
     def get_meeting_entry_exit_time(self, entry):
-        return '{} - {}'.format(entry['join_time'], entry['leave_time'])
+        return '{} - {}'.format(str(entry['join_time']), str(entry['leave_time']))
