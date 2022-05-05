@@ -15,17 +15,6 @@ class ZoomAPIClient(object):
     VERSION = 'v2'
     BASE_URL = 'https://api.zoom.us/' + VERSION
     TOKEN_EXPIRY = '1496091963999'
-    MEETING_TYPE = {
-        'SCHEDULED_MEETING': 2,
-        'WEBINAR': 5
-    }
-    APPROVAL_TYPE = {
-        'AUTOMATICALLY_APPROVE_REGISTRATION': 0,
-        'MANUALLY_APPROVE_REGISTRATION': 1
-    }
-    REGISTRATION_TYPE = {
-        'REGISTER_ONCE_AND_ATTEND': 1
-    }
 
     def __init__(self, zoom_admin_account):
         """Zoom API Client init"""
@@ -47,10 +36,6 @@ class ZoomAPIClient(object):
             'Authorization': 'Bearer' + self._token,
         }
 
-    def _persist_jwt_token(self):
-        """Store/Update JWT token for ZoomAdminAccount"""
-        self._zoom_admin_account.jwt_token = self._token
-
     def _send_request(self, http_method, endpoint, data, headers=None, **kwargs):
         """Send request"""
         url = self.BASE_URL + endpoint
@@ -67,7 +52,6 @@ class ZoomAPIClient(object):
         # Regenerate token in case of expiry
         if response.status_code == status.HTTP_401_UNAUTHORIZED and not kwargs.get('jwt_renewed'):
             self._create_jwt()
-            self._persist_jwt_token()
             return self._send_request(
                 http_method, endpoint, data, jwt_renewed=True, query_args=kwargs.get('query_args', {})
             )
@@ -94,11 +78,6 @@ class ZoomAPIClient(object):
             response = self._send_request('GET', endpoint, {}, query_args=query_args)
             participant.extend(response.get('participants', []))
         return participant
-
-    def get_meeting_details(self, meeting_id):
-        """Get meeting details"""
-        endpoint = ZoomAPIEndpoint.GET_MEETING.format(meeting_id=meeting_id)
-        return self._send_request('GET', endpoint, {})
 
     def get_meeting_instances(self, meeting_id):
         """Get past meeting instances UUID's"""

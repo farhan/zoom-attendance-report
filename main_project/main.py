@@ -4,7 +4,7 @@ from zoom_utils.models import ZoomAdminAccount
 from zoom_utils.zoom_report import ZoomMeetingReport
 
 if __name__ == '__main__':
-    print('Hi!')
+    print('----- Script running start! ------')
     properties = ProjectProperties()
     zoom_admin_account = ZoomAdminAccount(
         api_key=properties.ZOOM_ACCOUNT_API_KEY,
@@ -19,4 +19,4 @@ if __name__ == '__main__':
     meetings, report = report.get_report()
     xlsxwriter = xls_writer.XlsWriter(properties)
     xlsxwriter.write_meeting_report_into_xls(meetings, report)
-    print('----- Bye! ------')
+    print('----- Script running end! ------')

@@ -1,6 +1,9 @@
 import csv
 
+from pip._internal.utils.deprecation import deprecated
 
+
+@deprecated
 def write_meeting_report_into_csv(project_properties, meetings, report):
     csv_file_name = 'meeting_report_{}_{}_{}.xls'.format(
         project_properties.MEETING_ID,
