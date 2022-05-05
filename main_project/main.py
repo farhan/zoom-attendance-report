@@ -1,5 +1,5 @@
-from csv_writer import csv_writer
 from main_project.properties import ProjectProperties
+from writer import xls_writer
 from zoom_utils.models import ZoomAdminAccount
 from zoom_utils.zoom_report import ZoomMeetingReport
 
@@ -17,5 +17,6 @@ if __name__ == '__main__':
         zoom_admin_account=zoom_admin_account
     )
     meetings, report = report.get_report()
-    csv_writer.write_meeting_report_into_csv(properties, meetings, report)
+    xlsxwriter = xls_writer.XlsWriter(properties)
+    xlsxwriter.write_meeting_report_into_xls(meetings, report)
     print('----- Bye! ------')

@@ -10,3 +10,4 @@ class ProjectProperties:
         self.MEETING_ID = json_data['meeting']['meeting_id']
         self.START_DATE = json_data['meeting']['start_date']
         self.END_DATE = json_data['meeting']['end_date']
+        self.TIME_DIFFERENCE_HOURS = json_data['meeting']['time_difference_hours']

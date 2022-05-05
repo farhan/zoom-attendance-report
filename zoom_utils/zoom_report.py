@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from zoom_utils import utils
 from zoom_utils.api_client import ZoomAPIClient
 
 
@@ -19,7 +20,7 @@ class ZoomMeetingReport:
             # TODO: double encode the uuid
             # uuid = get_double_encoded_uuid(instance['uuid'])
             uuid = instance['uuid']
-            meeting_start_date_time = datetime.strptime(instance['start_time'], '%Y-%m-%dT%H:%M:%SZ')
+            meeting_start_date_time = utils.converted_date_time(instance['start_time'])
             if self.start_date <= meeting_start_date_time <= self.end_date:
                 meeting_participant_entries = zoom_client.get_participant_report(uuid)
                 meeting_start_date_time_str = str(meeting_start_date_time)
@@ -53,4 +54,7 @@ class ZoomMeetingReport:
         return {key: entry[key] for key in fields}
 
     def get_meeting_entry_exit_time(self, entry):
-        return '{} - {}'.format(str(entry['join_time']), str(entry['leave_time']))
+        return '{} - {}'.format(
+            utils.converted_date_time(entry['join_time']),
+            utils.converted_date_time(entry['leave_time'])
+        )
