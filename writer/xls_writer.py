@@ -33,17 +33,17 @@ class XlsWriter:
 
     def write_meeting_report_into_xls(self, meetings, report):
         xlsx_sheet = self.xlsx_file.add_worksheet()
-        self.write_headers(xlsx_sheet, meetings)
-        self.write_user_data(xlsx_sheet, meetings, report)
-        self.hide_columns(xlsx_sheet)
+        self.__write_headers(xlsx_sheet, meetings)
+        self.__write_user_data(xlsx_sheet, meetings, report)
+        self.__hide_columns(xlsx_sheet)
         self.xlsx_file.close()
 
-    def write_user_data(self, worksheet, meetings, report):
+    def __write_user_data(self, worksheet, meetings, report):
         row = 1
         for user_record in report:
             user_data = [report[user_record][key] for key in self.user_header_fields]
             worksheet.write_row(row, 0, user_data)
-            self.write_results_formulas(worksheet, row, meetings)
+            self.__write_results_formulas(worksheet, row, meetings)
             for meeting_report in report[user_record]['meetings_report']:
                 duration_mins = round(report[user_record]['meetings_report'][meeting_report]['duration'] / 60, 1)
                 col = self.meetings_data_start_col + meetings.index(meeting_report)
@@ -56,7 +56,7 @@ class XlsWriter:
             worksheet.set_row(row + 1, None, None, {'hidden': True})
             row += 2
 
-    def write_results_formulas(self, worksheet, row, meetings):
+    def __write_results_formulas(self, worksheet, row, meetings):
         meetings_start_cell = xl_rowcol_to_cell(row, self.meetings_data_start_col)
         meetings_end_cell = xl_rowcol_to_cell(row, self.meetings_data_start_col + len(meetings) - 1)
         # Attendance percentage formula
@@ -74,16 +74,24 @@ class XlsWriter:
         formula = '=COUNTBLANK({}:{})'.format(meetings_start_cell, meetings_end_cell)
         worksheet.write(row, self.no_of_absents_col, formula)
 
-    def write_headers(self, worksheet, meetings):
-        worksheet.write_row(0, 0, self.user_header_fields, self.format_align_center_bold)
+    def __write_headers(self, worksheet, meetings):
+        for idx, user_header in enumerate(self.user_header_fields):
+            get_header = {
+                'id': "Zoom Id",
+                'user_email': "Email Address",
+                'name': "Name",
+            }
+            data = get_header.get(user_header, user_header)
+            worksheet.write(0, idx, data, self.format_align_center_bold)
+        # worksheet.write_row(0, 0, self.user_header_fields, self.format_align_center_bold)
         worksheet.write_row(0, len(self.user_header_fields), self.result_header_fields, self.format_align_center_bold)
         for idx, meeting in enumerate(meetings):
             meeting_date_obj = utils.to_date_time(meeting)
             day = calendar.day_name[meeting_date_obj.weekday()]
-            data = '{}\n{}'.format(str(meeting_date_obj), day)
+            data = 'Mins Present in Meeting\n{}\n{}'.format(str(meeting_date_obj), day)
             worksheet.write(0, self.meetings_data_start_col + idx, data, self.format_align_center_bold)
 
-    def hide_columns(self, worksheet):
+    def __hide_columns(self, worksheet):
         first_col = self.user_header_fields.index('id')
         last_col = self.user_header_fields.index('user_email')
         worksheet.set_column(first_col, last_col, None, None, {'hidden': True})
