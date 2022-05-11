@@ -3,6 +3,7 @@ from datetime import datetime
 from zoom_utils import utils
 from zoom_utils.api_client import ZoomAPIClient
 from zoom_utils.constants import DATE_FORMAT
+from zoom_utils.utils import get_double_encoded_uuid
 
 
 class ZoomAttendanceReport:
@@ -19,9 +20,9 @@ class ZoomAttendanceReport:
         meetings = []
         meeting_instances = zoom_client.get_meeting_instances(self.meeting_id).get('meetings', [])
         for instance in meeting_instances:
-            # TODO: double encode the uuid per zoom doc recommendation
-            # uuid = get_double_encoded_uuid(instance['uuid'])
             uuid = instance['uuid']
+            if uuid.startswith('/'):
+                uuid = get_double_encoded_uuid(uuid)
             meeting_start_date_time = instance['start_time']
             if self.start_date <= utils.to_date_time(self.utc_time_diff, meeting_start_date_time) <= self.end_date:
                 meeting_participant_entries = zoom_client.get_participant_report(uuid)

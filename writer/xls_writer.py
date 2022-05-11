@@ -99,7 +99,7 @@ class XlsWriter:
         for idx, meeting in enumerate(meetings):
             meeting_date_obj = utils.to_date_time(self.properties.UTC_TIME_DIFFERENCE, meeting)
             day = calendar.day_name[meeting_date_obj.weekday()]
-            data = '{}\n{}\nAttended time (Mins)'.format(str(meeting_date_obj), day)
+            data = 'Attended time (Mins)\n{}\n{}'.format(str(meeting_date_obj), day)
             worksheet.write(0, self.meetings_data_start_col + idx, data, self.format_align_center_bold)
 
     def __hide_columns(self, worksheet):
