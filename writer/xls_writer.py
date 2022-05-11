@@ -46,18 +46,18 @@ class XlsWriter:
         self.__hide_columns(xlsx_sheet)
         self.xlsx_file.close()
 
-    def __write_user_data(self, worksheet, meetings, report):
+    def __write_user_data(self, worksheet, meetings, report_list):
         row = 1
-        for user_record in report:
-            user_data = [report[user_record][key] for key in self.user_header_fields]
+        for user_record_tuple in report_list:
+            user_data = [user_record_tuple[1][key] for key in self.user_header_fields]
             worksheet.write_row(row, 0, user_data)
             self.__write_results_formulas(worksheet, row, meetings)
-            for meeting_report in report[user_record]['meetings_report']:
-                duration_mins = round(report[user_record]['meetings_report'][meeting_report]['duration'] / 60, 1)
+            for meeting_report in user_record_tuple[1]['meetings_report']:
+                duration_mins = round(user_record_tuple[1]['meetings_report'][meeting_report]['duration'] / 60, 1)
                 col = self.meetings_data_start_col + meetings.index(meeting_report)
                 worksheet.write(row, col, duration_mins)
                 worksheet.write(
-                    row + 1, col, report[user_record]['meetings_report'][meeting_report]['entry_exit'],
+                    row + 1, col, user_record_tuple[1]['meetings_report'][meeting_report]['entry_exit'],
                     self.format_text_wrap
                 )
                 worksheet.set_column(row + 1, col, len(DATE_TIME_FORMAT) + 3)

@@ -28,7 +28,8 @@ class ZoomAttendanceReport:
                 self.__get_report_of_a_meeting_users(meeting_participant_entries, meeting_start_date_time, report)
                 meetings.append(meeting_start_date_time)
         meetings.sort()
-        # TODO: Sort the report dictionary according to inner name field
+        # Sort dictionary based on names, following method will return list of tuples(key, value)
+        report = sorted(report.items(), key=lambda x: x[1]['name'])
         return meetings, report
 
     def __get_report_of_a_meeting_users(self, meeting_participant_entries, meeting_start_date_time, report):
