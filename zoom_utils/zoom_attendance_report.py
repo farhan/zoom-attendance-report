@@ -6,11 +6,12 @@ from zoom_utils.constants import DATE_FORMAT
 
 
 class ZoomAttendanceReport:
-    def __init__(self, start_date, end_date, meeting_id, zoom_admin_account):
+    def __init__(self, start_date, end_date, meeting_id, zoom_admin_account, utc_time_diff):
         self.zoom_admin_account = zoom_admin_account
         self.start_date = datetime.strptime(start_date, DATE_FORMAT)
         self.end_date = datetime.strptime(end_date, DATE_FORMAT)
         self.meeting_id = meeting_id
+        self.utc_time_diff = utc_time_diff
 
     def get_report(self):
         zoom_client = ZoomAPIClient(self.zoom_admin_account)
@@ -22,11 +23,12 @@ class ZoomAttendanceReport:
             # uuid = get_double_encoded_uuid(instance['uuid'])
             uuid = instance['uuid']
             meeting_start_date_time = instance['start_time']
-            if self.start_date <= utils.to_date_time(meeting_start_date_time) <= self.end_date:
+            if self.start_date <= utils.to_date_time(self.utc_time_diff, meeting_start_date_time) <= self.end_date:
                 meeting_participant_entries = zoom_client.get_participant_report(uuid)
                 self.__get_report_of_a_meeting_users(meeting_participant_entries, meeting_start_date_time, report)
                 meetings.append(meeting_start_date_time)
         meetings.sort()
+        # TODO: Sort the report dictionary according to inner name field
         return meetings, report
 
     def __get_report_of_a_meeting_users(self, meeting_participant_entries, meeting_start_date_time, report):
@@ -56,6 +58,6 @@ class ZoomAttendanceReport:
 
     def __get_meeting_entry_exit_time(self, entry):
         return '{} - {}'.format(
-            utils.to_date_time(entry['join_time']),
-            utils.to_date_time(entry['leave_time'])
+            utils.to_date_time(self.utc_time_diff, entry['join_time']),
+            utils.to_date_time(self.utc_time_diff, entry['leave_time'])
         )

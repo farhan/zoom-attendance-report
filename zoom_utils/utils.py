@@ -1,7 +1,7 @@
 import urllib.parse
 from datetime import timedelta, datetime
 
-from zoom_utils.constants import DATE_TIME_FORMAT, DATE_TIME_DIFFERENCE_HOURS, DATE_FORMAT
+from zoom_utils.constants import DATE_TIME_FORMAT, DATE_FORMAT
 
 
 def get_double_encoded_uuid(uuid):
@@ -9,11 +9,11 @@ def get_double_encoded_uuid(uuid):
     return urllib.parse.quote(encoded_uuid)
 
 
-def to_date_time(date_time_str):
+def to_date_time(utc_time_difference, date_time_str):
     date_time = datetime.strptime(date_time_str, DATE_TIME_FORMAT)
-    return date_time - timedelta(hours=DATE_TIME_DIFFERENCE_HOURS)
+    return date_time + timedelta(hours=utc_time_difference)
 
 
-def to_date(date_time_str):
+def to_date(utc_time_difference, date_time_str):
     date_time = datetime.strptime(date_time_str, DATE_FORMAT)
-    return date_time - timedelta(hours=DATE_TIME_DIFFERENCE_HOURS)
+    return date_time + timedelta(hours=utc_time_difference)

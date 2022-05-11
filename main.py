@@ -14,7 +14,8 @@ if __name__ == '__main__':
         start_date=properties.START_DATE,
         end_date=properties.END_DATE,
         meeting_id=properties.MEETING_ID,
-        zoom_admin_account=zoom_admin_account
+        zoom_admin_account=zoom_admin_account,
+        utc_time_diff=properties.UTC_TIME_DIFFERENCE
     )
     meetings, report = report.get_report()
     xlsxwriter = xls_writer.XlsWriter(properties)

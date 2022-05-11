@@ -4,24 +4,32 @@ import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
 
 from zoom_utils import utils
-from zoom_utils.constants import MIN_MINUTES_FOR_ATTENDANCE, DATE_TIME_FORMAT
+from zoom_utils.constants import DATE_TIME_FORMAT
 
 
 class XlsWriter:
-    user_header_fields = ['id', 'user_email', 'name']
-    result_header_fields = ['Attendance\n%', 'No. of\nWorking days', 'No. of\nPresents', 'No. of\nAbsents', ]
-    meetings_data_start_col = len(user_header_fields) + len(result_header_fields)
-    attendance_percentage_col = len(user_header_fields)
-    no_of_working_days_col = attendance_percentage_col + 1
-    no_of_presents_col = no_of_working_days_col + 1
-    no_of_absents_col = no_of_presents_col + 1
 
-    def __init__(self, project_properties):
+    def __init__(self, properties):
         self.xlsx_file = xlsxwriter.Workbook('meeting_report_{}_{}_{}.xlsx'.format(
-            project_properties.MEETING_ID,
-            project_properties.START_DATE,
-            project_properties.END_DATE,
+            properties.MEETING_ID,
+            properties.START_DATE,
+            properties.END_DATE,
         ))
+        self.properties = properties
+        self.__init_formats__()
+        self.__init_headers_and_constants__(self.properties)
+
+    def __init_headers_and_constants__(self, properties):
+        self.user_header_fields = ['id', 'user_email', 'name']
+        presents_header = 'No. of\nPresents\nAttended > {} mins'.format(properties.MIN_MINUTES_FOR_ATTENDANCE)
+        self.result_header_fields = ['Attendance\n%', 'No. of\nWorking days', presents_header, 'No. of\nAbsents']
+        self.meetings_data_start_col = len(self.user_header_fields) + len(self.result_header_fields)
+        self.attendance_percentage_col = len(self.user_header_fields)
+        self.no_of_working_days_col = self.attendance_percentage_col + 1
+        self.no_of_presents_col = self.no_of_working_days_col + 1
+        self.no_of_absents_col = self.no_of_presents_col + 1
+
+    def __init_formats__(self):
         self.format_bold = self.xlsx_file.add_format({'bold': True})
         self.format_percentage = self.xlsx_file.add_format({'num_format': '0.0%'})
         self.format_text_wrap = self.xlsx_file.add_format({'text_wrap': 'true'})
@@ -68,7 +76,11 @@ class XlsWriter:
         formula = '=COUNTIF({}:{},"<>*")'.format(meetings_start_cell, meetings_end_cell)
         worksheet.write(row, self.no_of_working_days_col, formula)
         # No. of presents formula
-        formula = '=COUNTIF({}:{},">{}")'.format(meetings_start_cell, meetings_end_cell, MIN_MINUTES_FOR_ATTENDANCE)
+        formula = '=COUNTIF({}:{},">{}")'.format(
+            meetings_start_cell,
+            meetings_end_cell,
+            self.properties.MIN_MINUTES_FOR_ATTENDANCE
+        )
         worksheet.write(row, self.no_of_presents_col, formula)
         # No. of absents formula
         formula = '=COUNTBLANK({}:{})'.format(meetings_start_cell, meetings_end_cell)
@@ -83,12 +95,11 @@ class XlsWriter:
             }
             data = get_header.get(user_header, user_header)
             worksheet.write(0, idx, data, self.format_align_center_bold)
-        # worksheet.write_row(0, 0, self.user_header_fields, self.format_align_center_bold)
         worksheet.write_row(0, len(self.user_header_fields), self.result_header_fields, self.format_align_center_bold)
         for idx, meeting in enumerate(meetings):
-            meeting_date_obj = utils.to_date_time(meeting)
+            meeting_date_obj = utils.to_date_time(self.properties.UTC_TIME_DIFFERENCE, meeting)
             day = calendar.day_name[meeting_date_obj.weekday()]
-            data = 'Mins Present in Meeting\n{}\n{}'.format(str(meeting_date_obj), day)
+            data = '{}\n{}\nAttended time (Mins)'.format(str(meeting_date_obj), day)
             worksheet.write(0, self.meetings_data_start_col + idx, data, self.format_align_center_bold)
 
     def __hide_columns(self, worksheet):

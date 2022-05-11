@@ -1,7 +1,5 @@
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 DATE_FORMAT = '%Y-%m-%d'
-DATE_TIME_DIFFERENCE_HOURS = -5
-MIN_MINUTES_FOR_ATTENDANCE = 1
 
 
 class ZoomAPIEndpoint(object):
