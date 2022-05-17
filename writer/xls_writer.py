@@ -9,19 +9,19 @@ from zoom_utils.constants import DATE_TIME_FORMAT
 
 class XlsWriter:
 
-    def __init__(self, properties):
+    def __init__(self, configuration):
         self.xlsx_file = xlsxwriter.Workbook('meeting_report_{}_{}_{}.xlsx'.format(
-            properties.MEETING_ID,
-            properties.START_DATE,
-            properties.END_DATE,
+            configuration.MEETING_ID,
+            configuration.START_DATE,
+            configuration.END_DATE,
         ))
-        self.properties = properties
+        self.configuration = configuration
         self.__init_formats__()
-        self.__init_headers_and_constants__(self.properties)
+        self.__init_headers_and_constants__(self.configuration)
 
-    def __init_headers_and_constants__(self, properties):
+    def __init_headers_and_constants__(self, configuration):
         self.user_header_fields = ['id', 'user_email', 'name']
-        presents_header = 'No. of\nPresents\nAttended > {} mins'.format(properties.MIN_MINUTES_FOR_ATTENDANCE)
+        presents_header = 'No. of\nPresents\nAttended > {} mins'.format(configuration.MIN_MINUTES_FOR_ATTENDANCE)
         self.result_header_fields = ['Attendance\n%', 'No. of\nWorking days', presents_header, 'No. of\nAbsents']
         self.meetings_data_start_col = len(self.user_header_fields) + len(self.result_header_fields)
         self.attendance_percentage_col = len(self.user_header_fields)
@@ -79,7 +79,7 @@ class XlsWriter:
         formula = '=COUNTIF({}:{},">{}")'.format(
             meetings_start_cell,
             meetings_end_cell,
-            self.properties.MIN_MINUTES_FOR_ATTENDANCE
+            self.configuration.MIN_MINUTES_FOR_ATTENDANCE
         )
         worksheet.write(row, self.no_of_presents_col, formula)
         # No. of absents formula
@@ -97,7 +97,7 @@ class XlsWriter:
             worksheet.write(0, idx, data, self.format_align_center_bold)
         worksheet.write_row(0, len(self.user_header_fields), self.result_header_fields, self.format_align_center_bold)
         for idx, meeting in enumerate(meetings):
-            meeting_date_obj = utils.to_date_time(self.properties.UTC_TIME_DIFFERENCE, meeting)
+            meeting_date_obj = utils.to_date_time(self.configuration.UTC_TIME_DIFFERENCE, meeting)
             day = calendar.day_name[meeting_date_obj.weekday()]
             data = 'Attended time (Mins)\n{}\n{}'.format(str(meeting_date_obj), day)
             worksheet.write(0, self.meetings_data_start_col + idx, data, self.format_align_center_bold)

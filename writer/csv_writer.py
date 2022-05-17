@@ -4,11 +4,11 @@ from pip._internal.utils.deprecation import deprecated
 
 
 @deprecated
-def write_meeting_report_into_csv(project_properties, meetings, report):
+def write_meeting_report_into_csv(configuration, meetings, report):
     csv_file_name = 'meeting_report_{}_{}_{}.xls'.format(
-        project_properties.MEETING_ID,
-        project_properties.START_DATE,
-        project_properties.END_DATE,
+        configuration.MEETING_ID,
+        configuration.START_DATE,
+        configuration.END_DATE,
     )
     with open(csv_file_name, 'w') as csvfile:
         user_field_names = ['id', 'name', 'user_email']

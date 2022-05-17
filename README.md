@@ -11,7 +11,7 @@ This project fetches the data from the Zoom apis.
 
 
 ## Configure the Project
-Create `properties.json` on root of project directory (in sibling of properties.py)
+Create `configuration.json` on root of project directory (in sibling of configurationc.py)
 Add the appropriate values in the fields
 
 ```json

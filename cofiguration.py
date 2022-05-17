@@ -1,9 +1,9 @@
 import json
 
 
-class ProjectProperties:
+class Configuration:
     def __init__(self):
-        f = open('properties.json')
+        f = open('configuration.json')
         json_data = json.load(f)
         self.ZOOM_ACCOUNT_API_KEY = json_data['zoom_account']['api_key']
         self.ZOOM_ACCOUNT_API_SECRET = json_data['zoom_account']['api_secret']
