@@ -67,7 +67,7 @@ class ZoomAPIClient(object):
 
     def get_participant_report(self, meeting_id):
         """ Get participant report """
-        endpoint = ZoomAPIEndpoint.MEETING_PARTICIPANT_REPORT.format(meeting_id=meeting_id)
+        endpoint = ZoomAPIEndpoint.MEETING_PARTICIPANT_REPORT.value.format(meeting_id=meeting_id)
         query_args = {
             'page_size': 300
         }
@@ -81,5 +81,5 @@ class ZoomAPIClient(object):
 
     def get_meeting_instances(self, meeting_id):
         """Get past meeting instances UUID's"""
-        endpoint = ZoomAPIEndpoint.GET_MEETINGS_INSTANCES.format(meeting_id=meeting_id)
+        endpoint = ZoomAPIEndpoint.GET_MEETINGS_INSTANCES.value.format(meeting_id=meeting_id)
         return self._send_request('GET', endpoint, {})
