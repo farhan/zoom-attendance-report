@@ -1,7 +1,10 @@
+import os
 from enum import Enum
 
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 DATE_FORMAT = '%Y-%m-%d'
+# Environment Variable
+ENV_ZOOM_API_TOKEN_EXPIRY = os.getenv('ZOOM_API_TOKEN_EXPIRY', default='1496091963999')
 
 
 class ZoomAPIEndpoint(Enum):

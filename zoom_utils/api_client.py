@@ -1,10 +1,11 @@
 import json
+import logging
 
 import jwt
 import requests
 
 from zoom_utils import status
-from zoom_utils.constants import ZoomAPIEndpoint
+from zoom_utils.constants import ZoomAPIEndpoint, ENV_ZOOM_API_TOKEN_EXPIRY
 import logging as logger
 
 
@@ -14,7 +15,6 @@ class ZoomAPIClient(object):
     """
     VERSION = 'v2'
     BASE_URL = 'https://api.zoom.us/' + VERSION
-    TOKEN_EXPIRY = '1496091963999'
 
     def __init__(self, zoom_admin_account):
         """Zoom API Client init"""
@@ -24,7 +24,7 @@ class ZoomAPIClient(object):
     def _create_jwt(self):
         """Generate a new token against key and secret"""
         self._token = jwt.encode({
-            'iss': self._zoom_admin_account.api_key, 'exp': self.TOKEN_EXPIRY
+            'iss': self._zoom_admin_account.api_key, 'exp': ENV_ZOOM_API_TOKEN_EXPIRY
         }, self._zoom_admin_account.api_secret, algorithm='HS256')
 
         return self._token
@@ -46,8 +46,8 @@ class ZoomAPIClient(object):
             http_method, url, headers=request_headers, data=data, params=kwargs.get('query_args', {})
         )
 
-        print(u'Zoom API Request: {} - {}.'.format(url, data))
-        print(u'Zoom API Response: {} - {}.'.format(response.status_code, response.text))
+        logging.info(u'Zoom API Request: {} - {}.'.format(url, data))
+        logging.info(u'Zoom API Response: {} - {}.'.format(response.status_code, response.text))
 
         # Regenerate token in case of expiry
         if response.status_code == status.HTTP_401_UNAUTHORIZED and not kwargs.get('jwt_renewed'):

@@ -11,6 +11,7 @@ class ZoomAttendanceReport:
         self.zoom_admin_account = zoom_admin_account
         self.start_date = datetime.strptime(start_date, DATE_FORMAT)
         self.end_date = datetime.strptime(end_date, DATE_FORMAT)
+        self.end_date = self.end_date.replace(hour=23, minute=59)
         self.meeting_id = meeting_id
         self.utc_time_diff = utc_time_diff
 
@@ -28,8 +29,11 @@ class ZoomAttendanceReport:
                 meeting_participant_entries = zoom_client.get_participant_report(uuid)
                 self.__get_report_of_a_meeting_users(meeting_participant_entries, meeting_start_date_time, report)
                 meetings.append(meeting_start_date_time)
+        return self.sort_data(meetings, report)
+
+    def sort_data(self, meetings, report):
         meetings.sort()
-        # Sort dictionary based on names, following method will return list of tuples(key, value)
+        # Sort dictionary based on names, following method will return list of tuples having data (key, value)
         report = sorted(report.items(), key=lambda x: x[1]['name'])
         return meetings, report
 

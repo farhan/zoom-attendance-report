@@ -1,12 +1,14 @@
 import logging
 
+logging.basicConfig(level=logging.INFO)
+
 from configuration import Configuration
 from writer import xls_writer
 from zoom_utils.models import ZoomAdminAccount
 from zoom_utils.zoom_attendance_report import ZoomAttendanceReport
 
 if __name__ == '__main__':
-    print('----- Script running start! ------')
+    logging.info('----- Script running start! ------')
     configuration = Configuration()
     zoom_admin_account = ZoomAdminAccount(
         api_key=configuration.ZOOM_ACCOUNT_API_KEY,
@@ -22,4 +24,4 @@ if __name__ == '__main__':
     meetings, report = report.get_report()
     xlsxwriter = xls_writer.XlsWriter(configuration)
     xlsxwriter.write_meeting_report_into_xls(meetings, report)
-    print('----- Script running end! ------')
+    logging.info('----- Script running end! ------')
