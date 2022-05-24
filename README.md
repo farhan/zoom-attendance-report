@@ -25,7 +25,7 @@ Add the appropriate values in the fields
     "api_secret": "ADD_API_SECRET_HERE"
   },
   "meeting": {
-    "meeting_id": "ADD_API_MEETING_ID_HERE",
+    "meeting_id": "ADD_MEETING_ID_HERE",
     "start_date": "2022-01-01",
     "end_date": "2022-01-31",
     "minimum_minutes_for_attendance": "1",
