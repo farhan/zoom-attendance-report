@@ -22,8 +22,7 @@ class ZoomAttendanceReport:
         meeting_instances = zoom_client.get_meeting_instances(self.meeting_id).get('meetings', [])
         for instance in meeting_instances:
             uuid = instance['uuid']
-            if uuid.startswith('/'):
-                uuid = get_double_encoded_uuid(uuid)
+            uuid = get_double_encoded_uuid(uuid)
             meeting_start_date_time = instance['start_time']
             if self.start_date <= utils.to_date_time(self.utc_time_diff, meeting_start_date_time) <= self.end_date:
                 meeting_participant_entries = zoom_client.get_participant_report(uuid)
@@ -39,7 +38,7 @@ class ZoomAttendanceReport:
 
     def __get_report_of_a_meeting_users(self, meeting_participant_entries, meeting_start_date_time, report):
         for entry in meeting_participant_entries:
-            user_id = entry['id']
+            user_id = entry['user_id']
 
             if user_id not in report.keys():
                 report[user_id] = self.__get_user_data(entry)
