@@ -35,8 +35,13 @@ def test_auth_api():
     
     print(f"Status: {response.status_code}")
     print(f"Response: {response.text}")
-    
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✅ Test passed. API responded with 200")
+        return True
+    else:
+        print(f"❌ Test failed. API didn't respond with 200")
+        return False
 
 if __name__ == "__main__":
     test_auth_api()
