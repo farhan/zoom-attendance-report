@@ -1,1 +1,0 @@
-print("Hello, to the python testing world!")
