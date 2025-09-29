@@ -1,11 +1,11 @@
 import json
 import logging
+import time
 
-import jwt
 import requests
 
 from zoom_utils import status
-from zoom_utils.constants import ZoomAPIEndpoint, ENV_ZOOM_API_TOKEN_EXPIRY
+from zoom_utils.constants import ZoomAPIEndpoint
 import logging as logger
 
 
@@ -19,26 +19,51 @@ class ZoomAPIClient(object):
     def __init__(self, zoom_admin_account):
         """Zoom API Client init"""
         self._zoom_admin_account = zoom_admin_account
-        self._token = self._create_jwt()
+        self._access_token = None
+        self._token_expires_at = 0
+        self._api_url = None
 
-    def _create_jwt(self):
-        """Generate a new token against key and secret"""
-        self._token = jwt.encode({
-            'iss': self._zoom_admin_account.api_key, 'exp': ENV_ZOOM_API_TOKEN_EXPIRY
-        }, self._zoom_admin_account.api_secret, algorithm='HS256')
-
-        return self._token
+    def _get_oauth2_token(self):
+        """Get OAuth2 access token using account credentials"""
+        if self._access_token and time.time() < self._token_expires_at:
+            return self._access_token
+            
+        response = requests.post(
+            "https://zoom.us/oauth/token",
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            data={
+                'grant_type': 'account_credentials',
+                'account_id': self._zoom_admin_account.account_id
+            },
+            auth=(self._zoom_admin_account.api_key, self._zoom_admin_account.api_secret),
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            token_data = response.json()
+            self._access_token = token_data['access_token']
+            self._api_url = token_data.get('api_url', 'https://api.zoom.us')
+            # Set expiration time (subtract 60 seconds for safety margin)
+            self._token_expires_at = time.time() + token_data['expires_in'] - 60
+            return self._access_token
+        else:
+            logger.error(f'OAuth2 token request failed: {response.status_code} - {response.text}')
+            raise Exception(f'Failed to get OAuth2 token: {response.status_code}')
 
     def _get_request_header(self):
-        """Add generated token as a header for authorization"""
+        """Add OAuth2 token as a header for authorization"""
+        token = self._get_oauth2_token()
         return {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer' + self._token,
+            'Authorization': f'Bearer {token}',
         }
 
     def _send_request(self, http_method, endpoint, data, headers=None, **kwargs):
         """Send request"""
-        url = self.BASE_URL + endpoint
+        # Use the API URL from OAuth2 response, fallback to default
+        base_url = self._api_url or 'https://api.zoom.us'
+        url = f"{base_url}/{self.VERSION}{endpoint}"
+        
         request_headers = self._get_request_header()
         if headers:
             request_headers = dict(request_headers, **headers)
@@ -50,10 +75,12 @@ class ZoomAPIClient(object):
         logging.info(u'Zoom API Response: {} - {}.'.format(response.status_code, response.text))
 
         # Regenerate token in case of expiry
-        if response.status_code == status.HTTP_401_UNAUTHORIZED and not kwargs.get('jwt_renewed'):
-            self._create_jwt()
+        if response.status_code == status.HTTP_401_UNAUTHORIZED and not kwargs.get('token_renewed'):
+            # Force token refresh by clearing current token
+            self._access_token = None
+            self._token_expires_at = 0
             return self._send_request(
-                http_method, endpoint, data, jwt_renewed=True, query_args=kwargs.get('query_args', {})
+                http_method, endpoint, data, token_renewed=True, query_args=kwargs.get('query_args', {})
             )
 
         if status.is_success(response.status_code):

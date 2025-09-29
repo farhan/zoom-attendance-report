@@ -37,6 +37,7 @@ Add the appropriate values in the fields
 `api_key`, `api_secret`:
 Follow the following document to create the api keys and secret against the zoom account. It must be created from the
 Zoom account of the meeting host.
+https://developers.zoom.us/docs/internal-apps/s2s-oauth/
 https://marketplace.zoom.us/docs/guides/build/oauth-app/
 
 `meeting_id`: It's the id of the Zoom meeting, can be fetched from Zoom portal
