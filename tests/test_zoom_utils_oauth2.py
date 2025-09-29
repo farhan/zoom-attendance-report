@@ -31,7 +31,8 @@ def test_zoom_utils_oauth2():
         # Create zoom admin account
         zoom_admin_account = ZoomAdminAccount(
             api_key=configuration.ZOOM_ACCOUNT_API_KEY,
-            api_secret=configuration.ZOOM_ACCOUNT_API_SECRET
+            api_secret=configuration.ZOOM_ACCOUNT_API_SECRET,
+            account_id=configuration.ZOOM_ACCOUNT_ID
         )
         
         # Test OAuth2 token generation
@@ -39,6 +40,14 @@ def test_zoom_utils_oauth2():
         api_client = ZoomAPIClient(zoom_admin_account)
         
         logger.info("✅ OAuth2 API client created successfully")
+        
+        # Test OAuth2 token generation
+        try:
+            token = api_client._get_oauth2_token()
+            logger.info(f"✅ OAuth2 token generated successfully: {token[:20]}...")
+        except Exception as e:
+            logger.error(f"❌ OAuth2 token generation failed: {str(e)}")
+            return False
         
         # Test a simple API call
         try:

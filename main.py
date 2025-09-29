@@ -12,7 +12,8 @@ if __name__ == '__main__':
     configuration = Configuration()
     zoom_admin_account = ZoomAdminAccount(
         api_key=configuration.ZOOM_ACCOUNT_API_KEY,
-        api_secret=configuration.ZOOM_ACCOUNT_API_SECRET
+        api_secret=configuration.ZOOM_ACCOUNT_API_SECRET,
+        account_id=configuration.ZOOM_ACCOUNT_ID
     )
     report = ZoomAttendanceReport(
         start_date=configuration.START_DATE,
