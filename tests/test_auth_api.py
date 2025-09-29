@@ -17,8 +17,8 @@ def test_auth_api():
     config = load_config()
     
     # Get credentials
-    client_id = config['zoom_account']['api_key']
-    client_secret = config['zoom_account']['api_secret']
+    client_id = config['zoom_account']['client_id']
+    client_secret = config['zoom_account']['client_secret']
     account_id = config['zoom_account']['account_id']
     
     print(f"Testing with credentials: {client_id[:10]}...")

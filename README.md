@@ -21,8 +21,9 @@ Add the appropriate values in the fields
 ```json
 {
   "zoom_account": {
-    "api_key": "ADD_API_KEY_HERE",
-    "api_secret": "ADD_API_SECRET_HERE"
+    "account_id": "ADD_ACCOUNT_ID_HERE",
+    "client_id": "ADD_CLIENT_ID_HERE",
+    "client_secret": "ADD_CLIENT_SECRET_HERE"
   },
   "meeting": {
     "meeting_id": "ADD_MEETING_ID_HERE",
@@ -34,7 +35,7 @@ Add the appropriate values in the fields
 }
 ```
 
-`api_key`, `api_secret`:
+`account_id`, `client_id`, `client_secret`:
 Follow the following document to create the api keys and secret against the zoom account. It must be created from the
 Zoom account of the meeting host.
 https://developers.zoom.us/docs/internal-apps/s2s-oauth/

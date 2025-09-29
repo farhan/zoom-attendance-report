@@ -35,7 +35,7 @@ class ZoomAPIClient(object):
                 'grant_type': 'account_credentials',
                 'account_id': self._zoom_admin_account.account_id
             },
-            auth=(self._zoom_admin_account.api_key, self._zoom_admin_account.api_secret),
+            auth=(self._zoom_admin_account.client_id, self._zoom_admin_account.client_secret),
             timeout=30
         )
         

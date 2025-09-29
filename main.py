@@ -11,9 +11,9 @@ if __name__ == '__main__':
     logging.info('----- Script running start! ------')
     configuration = Configuration()
     zoom_admin_account = ZoomAdminAccount(
-        api_key=configuration.ZOOM_ACCOUNT_API_KEY,
-        api_secret=configuration.ZOOM_ACCOUNT_API_SECRET,
-        account_id=configuration.ZOOM_ACCOUNT_ID
+        account_id=configuration.ZOOM_ACCOUNT_ID,
+        client_id=configuration.ZOOM_ACCOUNT_CLIENT_ID,
+        client_secret=configuration.ZOOM_ACCOUNT_CLIENT_SECRET
     )
     report = ZoomAttendanceReport(
         start_date=configuration.START_DATE,

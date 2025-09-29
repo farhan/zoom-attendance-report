@@ -30,9 +30,9 @@ def test_zoom_utils_oauth2():
         
         # Create zoom admin account
         zoom_admin_account = ZoomAdminAccount(
-            api_key=configuration.ZOOM_ACCOUNT_API_KEY,
-            api_secret=configuration.ZOOM_ACCOUNT_API_SECRET,
-            account_id=configuration.ZOOM_ACCOUNT_ID
+            account_id=configuration.ZOOM_ACCOUNT_ID,
+            client_id=configuration.ZOOM_ACCOUNT_CLIENT_ID,
+            client_secret=configuration.ZOOM_ACCOUNT_CLIENT_SECRET
         )
         
         # Test OAuth2 token generation
